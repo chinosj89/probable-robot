@@ -86,7 +86,7 @@ module.exports = {
     removeThought(req, res) {
         User.findOneAndUpdate(
             { _id: req.params.userId },
-            { $pull: { thoughts: { thoughtId: req.params.thoughtIdId } } },
+            { $pull: { thoughts: { thoughtId: req.params.thoughtId } } },
             { runValidators: true, new: true }
         )
             .then((student) =>

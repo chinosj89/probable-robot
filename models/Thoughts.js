@@ -17,7 +17,7 @@ const thoughtsSchema = new Schema(
             type: String,
             required: true
         },
-        reaction: [reactionSchema],
+        reactions: [reactionSchema],
     },
     {
         timestamps: true,

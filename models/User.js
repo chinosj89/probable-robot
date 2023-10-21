@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose');
 const thoughtsSchema = require('./Thoughts');
-const friendsSchema = require('./Friends');
+
 
 // Schema to create Student model
 const userSchema = new Schema(
@@ -22,7 +22,10 @@ const userSchema = new Schema(
             required: [true, "Email required"]
         },
         thoughts: [thoughtsSchema],
-        friends: [friendsSchema],
+        friends: [{
+            type: Schema.Types.ObjectId,
+            ref: 'user',
+        },],
     },
     {
         toJSON: {
