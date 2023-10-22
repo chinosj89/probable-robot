@@ -65,7 +65,7 @@ module.exports = {
             });
     },
     // ADD THOUGHTS TO USER
-    addThoughts(req, res) {
+    addThought(req, res) {
         console.log('What were you thinking about?');
         console.log(req.body);
         User.findOneAndUpdate(
@@ -83,19 +83,19 @@ module.exports = {
             .catch((err) => res.status(500).json(err));
     },
     // REMOVE USER THOUGHTS
-    removeThought(req, res) {
+    deleteThought(req, res) {
         User.findOneAndUpdate(
             { _id: req.params.userId },
             { $pull: { thoughts: { thoughtId: req.params.thoughtId } } },
             { runValidators: true, new: true }
         )
-            .then((student) =>
-                !student
-                    ? res
-                        .status(404)
-                        .json({ message: 'No user found with that ID' })
-                    : res.json(student)
-            )
+            .then((user) => {
+                if (!user) {
+                    return res.status(404).json({ message: 'No user found with that ID' });
+                }
+                return Thoughts.deleteMany({ _id: { $in: user.thoughts } })
+                    .then(() => res.json({ message: 'Thoughts deleted' }));
+            })
             .catch((err) => res.status(500).json(err));
-    },
+    }
 }

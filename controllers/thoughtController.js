@@ -40,6 +40,7 @@ module.exports = {
     },
 
     // UPDATE A THOUGHT WILL YA?
+    // Reactions included
     updateThought(req, res) {
         Thoughts.findOneAndUpdate(
             { _id: req.params.thoughtId },
@@ -49,8 +50,21 @@ module.exports = {
             .then((thought) =>
                 !thought
                     ? res.status(404).json({ message: 'Could not find that thought. Think again ;)' })
-                    : res.json(course)
-            )
+                    : Reaction.create(req.body)
+                        .then(() => res.json({ message: 'Reaction added!' })))
             .catch((err) => res.status(500).json(err));
     },
+    // DELETE REACTION ONLY
+    deleteReaction(req, res) {
+        Reaction.findOneAndDelete({ _id: req.params.reactionId })
+            .then((reaction) => {
+                if (!reaction) {
+                    return res.status(404).json({ message: 'No reaction found with that ID' });
+                }
+                res.json({ message: 'Reactions deleted!' });
+            })
+            .catch((err) => res.status(500).json(err));
+    }
+
+
 }
