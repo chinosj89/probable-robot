@@ -1,11 +1,30 @@
-const username = [
-    'ChefMonica',
-    'RachelLovesCoffee',
-    'PhoebeBananaHammock',
-    'ChanandlerBong',
-    'DinosaurRulesRoss',
-    'JoeyDOOL',
+const userData = [
+    {
+        username: 'ChefMonica',
+        email: 'monica@example.com',
+    },
+    {
+        username: 'RachelLovesCoffee',
+        email: 'rachel@example.com',
+    },
+    {
+        username: 'PhoebeBananaHammock',
+        email: 'phoebe@example.com',
+    },
+    {
+        username: 'ChanandlerBong',
+        email: 'chandler@example.com',
+    },
+    {
+        username: 'DinosaurRulesRoss',
+        email: 'ross@example.com',
+    },
+    {
+        username: 'JoeyDOOL',
+        email: 'joey@example.com',
+    },
 ];
+
 
 const thoughts = [
     'This is nice',
@@ -39,9 +58,9 @@ const users = [];
 // Get a random item given an array
 const getRandomArrItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-// Gets a name
+// Gets a username and email
 const getRandomName = () =>
-    `${getRandomArrItem(username)}`;
+    getRandomArrItem(userData).username;
 
 // Function to generate random thouhts that we can add to the database. Includes reactions
 const getRandomThoughts = (int) => {
@@ -49,7 +68,7 @@ const getRandomThoughts = (int) => {
     for (let i = 0; i < int; i++) {
         results.push({
             thoughtText: getRandomArrItem(thoughts),
-            username: getRandomArrItem(username),
+            username: getRandomArrItem(userData).username,
             reactions: [...getReactions(2)],
         });
     }
@@ -64,13 +83,17 @@ const getReactions = (int) => {
     const results = [];
     for (let i = 0; i < int; i++) {
         results.push({
-            reactionBody: getRandomArrItem(reactionss),
+            reactionBody: getRandomArrItem(reactions),
             username: getRandomName(),
         });
     }
     return results;
 };
 
+// Create random friends for users
+const getRandomFriend = () => ({
+    username: getRandomArrItem(userData).username,
+});
 
 // Export the functions for use in seed.js
-module.exports = { getRandomName, getRandomThoughts };
+module.exports = { getRandomName, getRandomThoughts, getRandomFriend };
