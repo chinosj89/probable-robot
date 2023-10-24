@@ -10,7 +10,7 @@ module.exports = {
     // GET SINGLE THOUGHT
     getSingleThought(req, res) {
         Thoughts.findOne({ _id: req.params.thoughtId })
-            .select('-__v', 'reactionCount', 'updatedAt')
+            .select('-__v')
             .then((thought) =>
                 !thought
                     ? res.status(404).json({ message: 'Could not find that thought. Think again ;)' })
@@ -22,7 +22,7 @@ module.exports = {
         Thoughts.create(req.body)
             .then((thought) =>
                 User.findOneAndUpdate(
-                    { _id: req.params.userId },
+                    { _id: req.body.userId },
                     { $addToSet: { thoughts: thought._id } },
                     { runValidators: true, new: true }
                 ))
@@ -35,18 +35,6 @@ module.exports = {
             )
             .catch((err) => res.status(500).json(err));
     },
-    // DELETE A THOUGHT
-    deleteThought(req, res) {
-        Thoughts.findOneAndDelete({ _id: req.params.thoughtId })
-            .then((thought) =>
-                !thought
-                    ? res.status(404).json({ message: 'Could not find that thought. Think again ;)' })
-                    : Reaction.deleteMany({ _id: { $in: thought.reactions } })
-            )
-            .then(() => res.json({ message: 'Thoughts and reactions were deleted :(' }))
-            .catch((err) => res.status(500).json(err));
-    },
-
     // UPDATE A THOUGHT WILL YA?
     // Reactions included
     updateThought(req, res) {
@@ -55,24 +43,61 @@ module.exports = {
             { $set: req.body },
             { runValidators: true, new: true }
         )
-            .then((thought) =>
+            .then((thought) => {
+                if (!thought) {
+                    return res.status(404).json({ message: 'Could not find that thought. Think again ;)' });
+                }
+                res.json({ message: 'Did ya fix your thoughts?' });
+            })
+            .catch((err) => res.status(500).json(err));
+    },
+
+
+    // DELETE A THOUGHT
+    deleteThought(req, res) {
+        Thoughts.findOneAndRemove({ _id: req.params.thoughtId })
+            .then((thought) => {
+                return !thought
+                    ? res.status(404).json({ message: 'Could not find that thought. Think again ;)' })
+                    : User.findOneAndUpdate(
+                        { _id: req.params.userId },
+                        { $pull: { thoughts: req.params.thoughtId } }
+                    );
+            })
+            .then(() => res.json({ message: 'Thought deleted!' }))
+            .catch((err) => res.status(500).json(err));
+    },
+
+
+
+    addReaction(req, res) {
+        Thoughts.findOneAndUpdate(
+            { _id: req.params.thoughtId },
+            { $addToSet: { reactions: req.body } },
+            { runValidators: true, new: true }
+        )
+            .then((thought) => {
                 !thought
                     ? res.status(404).json({ message: 'Could not find that thought. Think again ;)' })
-                    : Reaction.create(req.body)
-                        .then(() => res.json({ message: 'Reaction added!' })))
+                    : res.json({ message: 'Well you reacted quite well!' });
+            })
             .catch((err) => res.status(500).json(err));
     },
     // DELETE REACTION ONLY
     deleteReaction(req, res) {
-        Reaction.findOneAndDelete({ _id: req.params.reactionId })
+        Thoughts.findOneAndUpdate(
+            { _id: req.params.thoughtId },
+            { $pull: { reactions: { reactionId: req.params.reactionId } } },
+            { runValidators: true, new: true }
+        )
             .then((reaction) => {
-                if (!reaction) {
-                    return res.status(404).json({ message: 'No reaction found with that ID' });
-                }
-                res.json({ message: 'Reactions deleted!' });
+                !reaction
+                    ? res.status(404).json({ message: 'No reaction found with that ID' })
+                    : res.json({ message: 'Reactions deleted!' });
             })
             .catch((err) => res.status(500).json(err));
-    }
+    },
+
 
 
 }
