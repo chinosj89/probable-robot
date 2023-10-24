@@ -68,7 +68,6 @@ const getRandomThoughts = (int) => {
     for (let i = 0; i < int; i++) {
         results.push({
             thoughtText: getRandomArrItem(thoughts),
-            username: getRandomArrItem(userData).username,
             reactions: [...getReactions(2)],
         });
     }
