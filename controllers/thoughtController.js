@@ -1,4 +1,4 @@
-const { Reaction, Thoughts } = require('../models');
+const { Reaction, Thoughts, User } = require('../models');
 
 module.exports = {
     // GET ALL THOUGHTS
@@ -10,7 +10,7 @@ module.exports = {
     // GET SINGLE THOUGHT
     getSingleThought(req, res) {
         Thoughts.findOne({ _id: req.params.thoughtId })
-            .select('-__v')
+            .select('-__v', 'reactionCount', 'updatedAt')
             .then((thought) =>
                 !thought
                     ? res.status(404).json({ message: 'Could not find that thought. Think again ;)' })
@@ -18,14 +18,22 @@ module.exports = {
             )
             .catch((err) => res.status(500).json(err));
     },
-    // CREATE A THOUGHT
-    createThought(req, res) {
+    addThought(req, res) {
         Thoughts.create(req.body)
-            .then((thought) => res.json({ thought, message: 'Nice thought. Philosopher vibes over here' }))
-            .catch((err) => {
-                console.log(err);
-                return res.status(500).json(err);
-            });
+            .then((thought) =>
+                User.findOneAndUpdate(
+                    { _id: req.params.userId },
+                    { $addToSet: { thoughts: thought._id } },
+                    { runValidators: true, new: true }
+                ))
+            .then((user) =>
+                !user
+                    ? res
+                        .status(404)
+                        .json({ message: 'No user found with that ID. Nice thought though :)' })
+                    : res.json(user)
+            )
+            .catch((err) => res.status(500).json(err));
     },
     // DELETE A THOUGHT
     deleteThought(req, res) {
