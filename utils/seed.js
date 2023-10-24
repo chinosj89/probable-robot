@@ -9,7 +9,7 @@ connection.once('open', async () => {
     await User.deleteMany({});
     await Thoughts.deleteMany({});
     const users = [];
-    const allThoughts = [await Thoughts.find()];
+    const allThoughts = await Thoughts.find();
     for (let i = 0; i < 20; i++) {
         const thoughts = getRandomThoughts(2);
         const userData = getRandomName();
@@ -25,6 +25,7 @@ connection.once('open', async () => {
     // loop through the saved applications, for each application we need to generate a application response and insert the application responses
     console.table(users);
     console.info('Users are thinking now....');
+    console.table(allThoughts);
     console.info('Seeding complete! 🌱');
     process.exit(0);
 });

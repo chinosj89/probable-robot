@@ -29,7 +29,7 @@ const thoughtsSchema = new Schema(
 );
 
 thoughtsSchema.virtual('reactionCount').get(function () {
-    return `This user reacts this many times ${this.reaction.length}! You think that's too many?`
+    return `This user reacts this many times ${this.reactions.length}! You think that's too many?`
 });
 
 const Thoughts = model('thoughts', thoughtsSchema);
